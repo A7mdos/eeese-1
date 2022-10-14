@@ -1,0 +1,20 @@
+POST http://localhost:3000/signup
+Content-Type: application/json
+
+{
+    "name": "hassan",
+    "email": "h@gmail.com",
+    "password": "12345678",
+    "phone": "969687123",
+    "gender": "male",
+    "age": 27
+}
+
+###
+
+POST  http://localhost:3000/
+Content-Type: application/json
+
+{
+    "id": 465465
+}
