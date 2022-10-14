@@ -86,38 +86,45 @@ router.post("/signup", async function (req, res) {
   return;
 });
 
-// router.post("/login", async function (req, res) {
-//   const userData = req.body;
-//   const enteredEmail = userData.email;
-//   const enteredPassword = userData.password;
+router.post("/login", async function (req, res) {
+  const userData = req.body;
+  const enteredEmail = userData.email;
+  const enteredPassword = userData.password;
 
-//   const existingUser = await db
-//     .getDb()
-//     .collection("users")
-//     .findOne({ email: enteredEmail });
+  const existingUser = await db
+    .getDb()
+    .collection("users")
+    .findOne({ email: enteredEmail });
 
-//   if (!existingUser) {
-//     res.json({ msg: "Couldn't log in - user not registered!" });
-//     return;
-//   }
+  if (!existingUser) {
+    res.json({
+      msg: "Couldn't log in - user not registered!",
+      status: 0,
+    });
+    return;
+  }
 
-//   const passwordsAreEqual = await bcrypt.compare(
-//     enteredPassword,
-//     existingUser.password
-//   );
+  const passwordsAreEqual = await bcrypt.compare(
+    enteredPassword,
+    existingUser.password
+  );
 
-//   if (!passwordsAreEqual) {
-//     res.json({msg: "Couldn't log in - password is incorrect!"});
-//     return res.redirect("/login");
-//   }
+  if (!passwordsAreEqual) {
+    res.json({
+      msg: "Couldn't log in - password is incorrect!",
+      status: 0,
+    });
+    return;
+  }
 
-//   req.session.user = { id: existingUser._id, email: existingUser.email };
-//   req.session.isAuthenticated = true;
-
-//   req.session.save(function () {
-//     res.redirect("/profile");
-//   });
-// });
+  existingUser.id = existingUser._id.toString()
+  delete existingUser._id
+  delete existingUser.password
+  res.json({
+    user: existingUser,
+    status: 1, 
+  });
+});
 
 // router.post("/logout", function (req, res) {
 //   req.session.user = null;
