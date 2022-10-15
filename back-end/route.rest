@@ -46,3 +46,20 @@ Content-Type: application/json
     "patientId": "634998d45c77ad1b570d3ebe",
     "category": { "id": "6349d89d5c77ad1b570d3ebf", "name": "Dermatology" }
 }
+
+###
+
+POST http://192.168.43.170:8081/new-category
+Content-Type: application/json
+
+{
+    "name": "Derma",
+    "doctor": {
+        "name": "Ahmed",
+        "phone": "+223165465965"
+    }
+}
+
+###
+
+GET http://192.168.43.170:8081/doctors/6349d8db5c77ad1b570d3ec0

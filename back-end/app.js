@@ -1,7 +1,9 @@
 const express = require("express");
 
-const db = require("./data/database");
+const db = require("./models/database");
 const authRoutes = require("./routes/auth");
+const appointments = require("./routes/appoinments");
+const doctors = require("./routes/doctors");
 
 const app = express();
 
@@ -9,11 +11,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 app.use(authRoutes);
+app.use(appointments);
+app.use(doctors);
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
 });
-
 
 const IPV4 = "192.168.43.170";
 const PORT = 8081;
