@@ -43,8 +43,17 @@ POST http://192.168.43.170:8081/appointments
 Content-Type: application/json
 
 {
-    "patientId": "634998d45c77ad1b570d3ebe",
-    "category": { "id": "6349d89d5c77ad1b570d3ebf", "name": "Dermatology" }
+    "patientId": "6349a957ecb5d7e10bbe1bdd",
+    "doctorId": "",
+    "category": { 
+        "id": "6349d89d5c77ad1b570d3ebf", 
+        "name": "Internal medicine" 
+    },
+
+    "timeslot": {
+        "num": 4,
+        "str": "11-12"
+    }
 }
 
 ###
@@ -62,4 +71,4 @@ Content-Type: application/json
 
 ###
 
-GET http://192.168.43.170:8081/doctors/6349d8db5c77ad1b570d3ec0
+GET http://192.168.43.170:8081/doctors

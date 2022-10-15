@@ -1,4 +1,5 @@
 const express = require("express");
+const { ObjectId } = require("mongodb");
 const db = require("../models/database");
 
 const router = express.Router();
@@ -18,29 +19,29 @@ router.post("/appointments", async (req, res) => {
   const appointmentData = req.body;
 
   const enteredId = appointmentData.patientId;
-  const enteredCategoryId = appointmentData.category.id;
-  const enteredCategoryName = appointmentData.category.name;
-  const enteredDate = appointmentData.date;
+  const enteredDoctorId = appointmentData.doctorId;
+  const enteredCategory = appointmentData.category; // id + name
+  const enteredTimeslot = appointmentData.timeslot; // num + str
 
   // Some validation should be added here
 
   const appointment = {
     patientId: new ObjectId(enteredId),
+    doctorId: new ObjectId(enteredDoctorId),
     category: {
-      id: new ObjectId(enteredCategoryId),
-      name: enteredCategoryName,
+      id: new ObjectId(enteredCategory.id),
+      name: enteredCategory.name,
     },
 
-    // Hardcoded (fix it later)
     timeslot: {
-      num: 1,
-      str: "8-9",
+      num: enteredTimeslot.num,
+      str: enteredTimeslot.str,
     },
   };
 
-  await db.getDb().collection("appointments").insertOne({ appointment });
+  await db.getDb().collection("appointments").insertOne(appointment);
 
-  res.json({ status: 1 });
+  res.json({ msg: "Appointment added succesfully!", status: 1 });
 });
 
 router.get("/appointments/:patientId", async (req, res) => {
