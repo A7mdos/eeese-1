@@ -23,11 +23,21 @@ router.post("/appointments", async (req, res) => {
   const enteredCategory = appointmentData.category; // id + name
   const enteredTimeslot = appointmentData.timeslot; // num + str
 
-  // Some validation should be added here
+  const doctor = await db
+    .getDb()
+    .collection("doctors")
+    .findOne({ _id: ObjectId(enteredDoctorId) });
 
   const appointment = {
     patientId: new ObjectId(enteredId),
-    doctorId: new ObjectId(enteredDoctorId),
+    doctor: {
+      id: doctor._id,
+      name: doctor.name,
+      phone: doctor.phone,
+      categoryId: doctor.categoryId,
+      hospital: doctor.hospital,
+    },
+
     category: {
       id: new ObjectId(enteredCategory.id),
       name: enteredCategory.name,

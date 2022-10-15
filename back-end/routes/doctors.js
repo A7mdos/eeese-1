@@ -21,4 +21,15 @@ router.get("/doctors/:categoryId", async (req, res) => {
   res.json(doctors);
 });
 
+router.get("/timeslots", async (req, res) => {
+    const slots = await db
+    .getDb()
+    .collection("timeslots")
+    .find()
+    .toArray();
+
+  res.json(slots);
+
+});
+
 module.exports = router;
