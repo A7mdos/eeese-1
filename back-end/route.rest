@@ -26,5 +26,23 @@ Content-Type: application/json
  
 {
     "email": "h@gmail.com",
-    "password": "121324"
+    "password": "12345678"
+}
+
+###
+
+GET http://192.168.43.170:8081/categories
+
+###
+
+GET http://192.168.43.170:8081/appointments/634998d45c77ad1b570d3ebe
+
+###
+
+POST http://192.168.43.170:8081/appointments
+Content-Type: application/json
+
+{
+    "patientId": "634998d45c77ad1b570d3ebe",
+    "category": { "id": "6349d89d5c77ad1b570d3ebf", "name": "Dermatology" }
 }

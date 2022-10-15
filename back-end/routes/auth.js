@@ -2,6 +2,7 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 
 const db = require("../data/database");
+const { ObjectId } = require("mongodb");
 
 const router = express.Router();
 
@@ -27,51 +28,29 @@ router.get("/", function (req, res) {
 // });
 
 router.post("/signup", async function (req, res) {
-  const userData = req.body;
+  const patientData = req.body;
 
-  const enteredEmail = userData.email;
-  const enteredPassword = userData.password;
+  const enteredEmail = patientData.email;
+  const enteredPassword = patientData.password;
 
-  const enteredName = userData.name;
-  const enteredPhone = userData.phone;
-  const enteredAge = userData.age;
-  const enteredGender = userData.gender;
+  const enteredName = patientData.name;
+  const enteredPhone = patientData.phone;
+  const enteredAge = patientData.age;
+  const enteredGender = patientData.gender;
 
-  //   if (
-  //     !enteredEmail ||
-  //     !enteredConfirmEmail ||
-  //     !enteredPassword ||
-  //     enteredPassword.trim().length < 6 ||
-  //     enteredEmail !== enteredConfirmEmail ||
-  //     !enteredEmail.includes("@")
-  //   ) {
-  //     req.session.inputData = {
-  //       hasError: true,
-  //       message: "Invalid input - please check your data.",
-  //       email: enteredEmail,
-  //       confirmEmail: enteredConfirmEmail,
-  //       password: enteredPassword,
-  //     };
-
-  //     req.session.save(function () {
-  //       res.redirect("/signup");
-  //     });
-  //     return;
-  //   }
-
-  const existingUser = await db
+  const existingPatient = await db
     .getDb()
-    .collection("users")
+    .collection("patients")
     .findOne({ email: enteredEmail });
 
-  if (existingUser) {
-    res.json({ msg: "User already exists" });
+  if (existingPatient) {
+    res.json({ msg: "Patient already exists", status: 0 });
     return;
   }
 
   const hashedPassword = await bcrypt.hash(enteredPassword, 12);
 
-  const user = {
+  const patient = {
     name: enteredName,
     email: enteredEmail,
     password: hashedPassword,
@@ -80,25 +59,29 @@ router.post("/signup", async function (req, res) {
     age: enteredAge,
   };
 
-  await db.getDb().collection("users").insertOne(user);
+  await db.getDb().collection("patients").insertOne(patient);
 
-  res.json({ msg: "User created successfully!" });
+  res.json({
+    msg: "Patient created successfully!",
+    patient: patient,
+    status: 1,
+  });
   return;
 });
 
 router.post("/login", async function (req, res) {
-  const userData = req.body;
-  const enteredEmail = userData.email;
-  const enteredPassword = userData.password;
+  const patientData = req.body;
+  const enteredEmail = patientData.email;
+  const enteredPassword = patientData.password;
 
-  const existingUser = await db
+  const existingPatient = await db
     .getDb()
-    .collection("users")
+    .collection("patients")
     .findOne({ email: enteredEmail });
 
-  if (!existingUser) {
+  if (!existingPatient) {
     res.json({
-      msg: "Couldn't log in - user not registered!",
+      msg: "Couldn't log in - patient not registered!",
       status: 0,
     });
     return;
@@ -106,7 +89,7 @@ router.post("/login", async function (req, res) {
 
   const passwordsAreEqual = await bcrypt.compare(
     enteredPassword,
-    existingUser.password
+    existingPatient.password
   );
 
   if (!passwordsAreEqual) {
@@ -117,12 +100,12 @@ router.post("/login", async function (req, res) {
     return;
   }
 
-  existingUser.id = existingUser._id.toString()
-  delete existingUser._id
-  delete existingUser.password
+  existingPatient.id = existingPatient._id.toString();
+  delete existingPatient._id;
+  delete existingPatient.password;
   res.json({
-    user: existingUser,
-    status: 1, 
+    patient: existingPatient,
+    status: 1,
   });
 });
 
@@ -132,5 +115,52 @@ router.post("/login", async function (req, res) {
 
 //   res.redirect("/");
 // });
+
+router.get("/categories", async (req, res) => {
+  const categories = await db.getDb().collection("categories").find().toArray();
+
+  categories.forEach((category) => {
+    category.id = category._id.toString();
+    delete category._id;
+  });
+
+  res.json(categories);
+});
+
+router.post("/appointments", async (req, res) => {
+  const appointmentData = req.body;
+
+  const enteredId = appointmentData.patientId;
+  const enteredCategoryId = appointmentData.category.id; 
+  const enteredCategoryName = appointmentData.category.name; 
+  const enteredDate = appointmentData.date;
+
+  // Some validation should be added here 
+  
+  const appointment = {
+    patientId: new ObjectId(enteredId),
+    category: {
+      id: new ObjectId(enteredCategoryId),
+      name: enteredCategoryName,
+    },
+    date: enteredDate,
+  };
+
+  await db.getDb().collection("appointments").insertOne({ appointment });
+
+  res.json({ status: 1 })
+});
+
+router.get("/appointments/:patientId", async (req, res) => {
+  patientId = new ObjectId(req.params.patientId);
+
+  const appointments = await db
+    .getDb()
+    .collection("appointments")
+    .find({ patientId: patientId })
+    .toArray();
+
+  res.json(appointments);
+});
 
 module.exports = router;
